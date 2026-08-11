@@ -1,5 +1,5 @@
 ﻿
-#💬 ChatSocial
+💬 ChatSocial
 
 Uma rede social de mensagens desenvolvida com Python e Streamlit, com foco em uma experiência simples, limpa e intuitiva para comunicação entre usuários.
 
