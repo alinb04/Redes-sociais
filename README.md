@@ -1,5 +1,9 @@
 ﻿
 💬 ChatSocial
+<img width="1038" height="837" alt="image" src="https://github.com/user-attachments/assets/9605f7a5-ea13-4ab3-a53c-93e1cdb74ad1" />
+<img width="1185" height="876" alt="image" src="https://github.com/user-attachments/assets/63ebe00c-8441-4572-9815-ffa33ac82a02" />
+<img width="1116" height="834" alt="image" src="https://github.com/user-attachments/assets/5e409819-39e4-47a5-a94a-2483c836aaf5" />
+<img width="1072" height="876" alt="image" src="https://github.com/user-attachments/assets/c0bcc719-2883-4701-8fc5-2d28013cb24f" />
 
 Uma rede social de mensagens desenvolvida com Python e Streamlit, com foco em uma experiência simples, limpa e intuitiva para comunicação entre usuários.
 
@@ -19,26 +23,7 @@ Uma rede social de mensagens desenvolvida com Python e Streamlit, com foco em um
 - Streamlit
 - HTML
 - CSS
-
-📁 Estrutura do projeto
-
-rede-social/
-│
-├── app.py
-├── requirements.txt
-├── README.md
-│
-├── pages/
-│ ├── 1_Conversas.py
-│ ├── 2_Chat.py
-│ └── 3_Sobre.py
-│
-├── assets/
-│ └── logo.png
-│
-└── utils/
-    └── mensagens.py
-
+- 
 ▶️ Como executar
 
 1. Clone o repositório
