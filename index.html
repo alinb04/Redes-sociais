@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+
+<div class="container">
+
+    <div class="logo">
+        <h1>Connect</h1>
+        <p>Conecte-se com seus amigos</p>
+    </div>
+
+    <div class="card">
+
+        <h2>Entrar</h2>
+
+        <input type="email" id="email" placeholder="📧 E-mail">
+
+        <input type="password" id="senha" placeholder="🔒 Senha">
+
+        <p id="erro" style="color:#e0245e; margin-bottom:15px; display:none;"></p>
+
+        <button onclick="entrar()">
+            Entrar
+        </button>
+
+        <p class="link">
+            Não possui uma conta?
+            <a href="cadastro.html">Cadastre-se</a>
+        </p>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+
+async function entrar() {
+
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value;
+    const erro = document.getElementById("erro");
+
+    erro.style.display = "none";
+
+    if (email === "" || senha === "") {
+        erro.textContent = "Preencha e-mail e senha.";
+        erro.style.display = "block";
+        return;
+    }
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: senha
+    });
+
+    if (error) {
+        erro.textContent = "E-mail ou senha inválidos.";
+        erro.style.display = "block";
+        return;
+    }
+
+    window.location.href = "usuario.html";
+}
+
+// Se já estiver logado, pula direto pro app
+(async function () {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (session) {
+        window.location.href = "usuario.html";
+    }
+})();
+
+</script>
+
+</body>
+</html>

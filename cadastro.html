@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect - Cadastro</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+
+<div class="container">
+
+    <div class="logo">
+        <h1>Connect</h1>
+        <p>Crie sua conta</p>
+    </div>
+
+    <div class="card">
+
+        <h2>Criar conta</h2>
+
+        <input type="text" id="nome" placeholder="👤 Nome completo">
+
+        <input type="text" id="username" placeholder="@ Nome de usuário">
+
+        <input type="email" id="email" placeholder="📧 E-mail">
+
+        <input type="password" id="senha" placeholder="🔒 Senha (mín. 6 caracteres)">
+
+        <p id="erro" style="color:#e0245e; margin-bottom:15px; display:none;"></p>
+
+        <button onclick="criarConta()">
+            Criar conta
+        </button>
+
+        <p class="link">
+            Já possui uma conta?
+            <a href="index.html">Entrar</a>
+        </p>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+
+async function criarConta() {
+
+    const nome = document.getElementById("nome").value.trim();
+    const username = document.getElementById("username").value.trim().toLowerCase();
+    const email = document.getElementById("email").value.trim();
+    const senha = document.getElementById("senha").value;
+    const erro = document.getElementById("erro");
+
+    erro.style.display = "none";
+
+    if (nome === "" || username === "" || email === "" || senha === "") {
+        erro.textContent = "Preencha todos os campos.";
+        erro.style.display = "block";
+        return;
+    }
+
+    if (senha.length < 6) {
+        erro.textContent = "A senha precisa ter pelo menos 6 caracteres.";
+        erro.style.display = "block";
+        return;
+    }
+
+    // O nome e o username vão nos metadados do usuário.
+    // O gatilho "on_auth_user_created" no banco usa esses dados
+    // para criar a linha correspondente na tabela profiles.
+    const { error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: senha,
+        options: {
+            data: {
+                nome: nome,
+                username: username
+            }
+        }
+    });
+
+    if (error) {
+        if (error.message.includes("already registered")) {
+            erro.textContent = "Esse e-mail já está cadastrado.";
+        } else {
+            erro.textContent = "Erro ao criar conta: " + error.message;
+        }
+        erro.style.display = "block";
+        return;
+    }
+
+    window.location.href = "usuario.html";
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect - Conversas</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- CABEÇALHO -->
+
+<header class="messages-header">
+
+    <h2>Conversas</h2>
+
+    <a href="usuario.html" class="profile-button">
+        👤
+    </a>
+
+</header>
+
+
+<!-- CONTEÚDO -->
+
+<main class="messages-page">
+
+
+    <!-- PESQUISA -->
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="pesquisa"
+            placeholder="Pesquisar..."
+        >
+
+    </div>
+
+
+    <!-- LISTA DE CONVERSAS -->
+
+    <div id="listaConversas">
+        <p style="padding: 20px; color:#999;">Carregando conversas...</p>
+    </div>
+
+
+</main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+
+async function carregarConversas() {
+
+    const user = await exigirLogin();
+    if (!user) return;
+
+    // Todos os outros perfis cadastrados viram "conversas possíveis"
+    const { data: perfis, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .neq("id", user.id);
+
+    const lista = document.getElementById("listaConversas");
+
+    if (error) {
+        lista.innerHTML = `<p style="padding:20px; color:#e0245e;">Erro ao carregar: ${error.message}</p>`;
+        return;
+    }
+
+    if (!perfis || perfis.length === 0) {
+        lista.innerHTML = `<p style="padding:20px; color:#999;">Nenhum outro usuário cadastrado ainda. Crie outra conta para testar o chat!</p>`;
+        return;
+    }
+
+    lista.innerHTML = "";
+
+    for (const perfil of perfis) {
+
+        // Busca a última mensagem trocada entre os dois
+        const { data: ultimaMsg } = await supabaseClient
+            .from("messages")
+            .select("content, created_at")
+            .or(
+                `and(sender_id.eq.${user.id},receiver_id.eq.${perfil.id}),` +
+                `and(sender_id.eq.${perfil.id},receiver_id.eq.${user.id})`
+            )
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+        const preview = ultimaMsg ? ultimaMsg.content : "Diga oi 👋";
+        const hora = ultimaMsg
+            ? new Date(ultimaMsg.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+            : "";
+
+        const link = document.createElement("a");
+        link.href = "conversas.html?usuario=" + perfil.id;
+        link.className = "conversation";
+        link.dataset.name = perfil.nome.toLowerCase();
+
+        link.innerHTML = `
+            <div class="conversation-avatar">${perfil.avatar || "👤"}</div>
+            <div class="conversation-content">
+                <div class="conversation-name">${perfil.nome}</div>
+                <div class="conversation-preview">${preview}</div>
+            </div>
+            <div class="conversation-time">${hora}</div>
+        `;
+
+        lista.appendChild(link);
+    }
+
+    ativarPesquisa();
+}
+
+function ativarPesquisa() {
+
+    const pesquisa = document.getElementById("pesquisa");
+    const conversas = document.querySelectorAll(".conversation");
+
+    pesquisa.addEventListener("input", function () {
+
+        const texto = pesquisa.value.toLowerCase().trim();
+
+        conversas.forEach(function (conversa) {
+            const nome = conversa.dataset.name;
+            conversa.style.display = nome.includes(texto) ? "flex" : "none";
+        });
+
+    });
+}
+
+carregarConversas();
+
+</script>
+
+</body>
+
+</html>
