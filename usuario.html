@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect - Perfil</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- CABEÇALHO -->
+
+<header>
+
+    <a href="mensagens.html" class="back">
+        ←
+    </a>
+
+    <h2>Perfil</h2>
+
+    <div></div>
+
+</header>
+
+
+<!-- PERFIL -->
+
+<main class="profile">
+
+
+    <!-- FOTO -->
+
+    <div class="foto" id="avatar">
+        👤
+    </div>
+
+
+    <!-- NOME -->
+
+    <h1 id="nome">
+        Carregando...
+    </h1>
+
+
+    <!-- USUÁRIO -->
+
+    <p class="username" id="username">
+        @...
+    </p>
+
+    <p class="bio" id="bio"></p>
+
+
+    <!-- BOTÃO EDITAR -->
+
+    <button
+        onclick="editarPerfil()"
+        class="editar">
+        Editar perfil
+    </button>
+
+
+    <!-- OPÇÕES -->
+
+    <div class="menu">
+
+
+        <a href="mensagens.html" class="menu-link">
+
+<span class="menu-icon">
+    💬
+</span>
+
+<div class="menu-text">
+    <strong>Minhas conversas</strong>
+    <small>Ver suas mensagens</small>
+</div>
+
+<span class="menu-arrow">
+    ›
+</span>
+
+
+</a>
+
+
+
+        <a href="notificacoes.html">
+
+            <span>
+                🔔
+            </span>
+
+            Notificações
+
+        </a>
+
+
+        <a href="#">
+
+            <span>
+                ⚙️
+            </span>
+
+            Configurações
+
+        </a>
+
+
+        <a href="#">
+
+            <span>
+                🔒
+            </span>
+
+            Privacidade
+
+        </a>
+
+
+        <a href="#">
+
+            <span>
+                🌙
+            </span>
+
+            Aparência
+
+        </a>
+
+
+        <a
+            href="#"
+            onclick="sair(); return false;"
+            class="sair">
+
+            <span>
+                🚪
+            </span>
+
+            Sair da conta
+
+        </a>
+
+
+    </div>
+
+
+</main>
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+
+let usuarioAtual = null;
+
+async function carregarPerfil() {
+
+    const user = await exigirLogin();
+    if (!user) return;
+
+    usuarioAtual = user;
+
+    const { data: perfil, error } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+    if (error || !perfil) {
+        document.getElementById("nome").textContent = "Perfil não encontrado";
+        return;
+    }
+
+    document.getElementById("avatar").textContent = perfil.avatar || "👤";
+    document.getElementById("nome").textContent = perfil.nome;
+    document.getElementById("username").textContent = "@" + perfil.username;
+    document.getElementById("bio").textContent = perfil.bio || "";
+}
+
+async function editarPerfil() {
+
+    const { data: perfil } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", usuarioAtual.id)
+        .single();
+
+    const novoNome = prompt("Nome:", perfil.nome);
+    if (novoNome === null) return;
+
+    const novaBio = prompt("Bio:", perfil.bio || "");
+    if (novaBio === null) return;
+
+    const { error } = await supabaseClient
+        .from("profiles")
+        .update({ nome: novoNome, bio: novaBio })
+        .eq("id", usuarioAtual.id);
+
+    if (error) {
+        alert("Erro ao salvar: " + error.message);
+        return;
+    }
+
+    carregarPerfil();
+}
+
+async function sair() {
+    await supabaseClient.auth.signOut();
+    window.location.href = "index.html";
+}
+
+carregarPerfil();
+
+</script>
+
+</body>
+
+</html>
